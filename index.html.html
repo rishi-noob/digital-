@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Digital Wellbeing</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <link rel="stylesheet" href="index.css.css">
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="container" id="loginPage">
+        <h1>Digital Wellbeing</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <!-- Usage Input Page -->
+    <div class="container hidden" id="usagePage">
+        <h1>Track Your Usage</h1>
+        
+        <div class="chart-container">
+            <canvas id="averageUsageChart"></canvas>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number">2.5 hours</div>
+                <div class="stat-label">Average Daily YouTube Usage</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">1.8 hours</div>
+                <div class="stat-label">Average Daily Instagram Usage</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">1,560 hours</div>
+                <div class="stat-label">Yearly Time Spent</div>
+            </div>
+        </div>
+
+        <form id="usageForm">
+            <div class="form-group">
+                <label for="youtubeTime">Daily YouTube Usage (hours)</label>
+                <input type="number" id="youtubeTime" min="0" max="24" step="0.5" required>
+            </div>
+            <div class="form-group">
+                <label for="instagramTime">Daily Instagram Usage (hours)</label>
+                <input type="number" id="instagramTime" min="0" max="24" step="0.5" required>
+            </div>
+            <div class="form-group">
+                <label for="reduce">Which platform would you like to reduce?</label>
+                <select id="reduce" required>
+                    <option value="">Select platform</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="instagram">Instagram</option>
+                </select>
+            </div>
+            <button type="submit">Get Alternatives</button>
+        </form>
+    </div>
+
+    <!-- Alternatives Page -->
+    <div class="container hidden" id="alternativesPage">
+        <h1>Better Alternatives</h1>
+        <div class="alternatives" id="alternativesList">
+            <!-- Alternatives will be dynamically added here -->
+        </div>
+
+        <div class="app-suggestions">
+            <h2>Productive App Alternatives</h2>
+            <div id="appSuggestions">
+                <!-- App suggestions will be dynamically added here -->
+            </div>
+        </div>
+        <button onclick="showUsagePage()">Back to Usage</button>
+    </div>
+
+    <script>
+        const loginPage = document.getElementById('loginPage');
+        const usagePage = document.getElementById('usagePage');
+        const alternativesPage = document.getElementById('alternativesPage');
+        const alternativesList = document.getElementById('alternativesList');
+        const appSuggestions = document.getElementById('appSuggestions');
+
+        // Initialize usage chart
+        const ctx = document.getElementById('averageUsageChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'YouTube Usage (hours)',
+                    data: [2.5, 2.8, 2.3, 3.0, 3.5, 4.0, 3.8],
+                    backgroundColor: 'rgba(102, 126, 234, 0.5)',
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Instagram Usage (hours)',
+                    data: [1.8, 1.5, 2.0, 1.7, 2.2, 2.5, 2.3],
+                    backgroundColor: 'rgba(118, 75, 162, 0.5)',
+                    borderColor: 'rgba(118, 75, 162, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Hours'
+                        }
+                    }
+                }
+            }
+        });
+
+        const youtubeAlternatives = [
+            { title: 'Read a Book', description: 'Expand your knowledge and imagination through reading. Try setting a goal of 30 minutes per day.' },
+            { title: 'Learn an Instrument', description: 'Channel your entertainment time into creating music instead of just consuming content.' },
+            { title: 'Online Courses', description: 'Transform entertainment time into learning time with structured online courses.' },
+            { title: 'Exercise', description: 'Use the time for physical fitness and mental wellbeing through regular exercise.' }
+        ];
+
+        const instagramAlternatives = [
+            { title: 'Photography', description: 'Instead of browsing photos, create your own! Learn photography and develop your artistic skills.' },
+            { title: 'Cooking', description: 'Try new recipes and share your culinary creations with friends and family in person.' },
+            { title: 'Outdoor Activities', description: 'Get outside, exercise, and create real-world experiences worth sharing.' },
+            { title: 'Art & Crafts', description: 'Channel your creativity into making physical art and crafts instead of scrolling through images.' }
+        ];
+
+        const productiveApps = {
+            youtube: [
+                { name: 'Coursera', description: 'Access high-quality online courses from top universities' },
+                { name: 'Duolingo', description: 'Learn a new language in just 5 minutes per day' },
+                { name: 'Kindle', description: 'Read books on any device, anytime, anywhere' },
+                { name: 'Udemy', description: 'Learn specific skills with expert-led video courses' }
+            ],
+            instagram: [
+                { name: 'VSCO', description: 'Professional photo editing and creative community' },
+                { name: 'Strava', description: 'Track and share your fitness activities' },
+                { name: 'Pinterest', description: 'Find creative inspiration and save ideas' },
+                { name: 'Meetup', description: 'Connect with people who share your interests in real life' }
+            ]
+        };
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            loginPage.classList.add('hidden');
+            usagePage.classList.remove('hidden');
+        });
+
+        document.getElementById('usageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const platform = document.getElementById('reduce').value;
+            
+            // Clear previous alternatives
+            alternativesList.innerHTML = '';
+            appSuggestions.innerHTML = '';
+            
+            // Add new alternatives based on selected platform
+            const alternatives = platform === 'youtube' ? youtubeAlternatives : instagramAlternatives;
+            alternatives.forEach(alt => {
+                const card = document.createElement('div');
+                card.className = 'alternative-card';
+                card.innerHTML = `
+                    <h3>${alt.title}</h3>
+                    <p>${alt.description}</p>
+                `;
+                alternativesList.appendChild(card);
+            });
+
+            // Add app suggestions
+            const apps = productiveApps[platform];
+            apps.forEach(app => {
+                const appCard = document.createElement('div');
+                appCard.className = 'app-card';
+                appCard.innerHTML = `
+                    <div class="app-icon">${app.name[0]}</div>
+                    <div class="app-info">
+                        <h4>${app.name}</h4>
+                        <p>${app.description}</p>
+                    </div>
+                `;
+                appSuggestions.appendChild(appCard);
+            });
+
+            usagePage.classList.add('hidden');
+            alternativesPage.classList.remove('hidden');
+        });
+
+        function showUsagePage() {
+            alternativesPage.classList.add('hidden');
+            usagePage.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
